@@ -64,7 +64,7 @@ v-text 和 v-html 都是只能从Model到View的单项绑定，反过来不可�
 
 <body>
   <div id="app">
-    <h1>姓名: <label v-text="Name">
+    <h1>姓名: <label v-text="Name"></h1>
 
 <div id="app">
   <ul>
