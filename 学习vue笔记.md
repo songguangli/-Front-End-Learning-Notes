@@ -78,7 +78,7 @@ v-text 和 v-html 都是只能从Model到View的单项绑定，反过来不可�
 var vue = new Vue({
   el: '#app',
   data: {
-    values: {Name：＂小明＂，Age: 20, Sex:　＂男＂}
+    values: {Name：＂小明＂，Age: 20, Gender:　＂男＂}
   }
 })
 </script>
@@ -285,3 +285,639 @@ new Vue ({
   </div>
 </template>
 
+生命周期钩子：在 “某一时刻” 会 “自动执行” 的函数
+beforeCreate //实例生成之前
+created // 实例生成之后
+然后判断是否有 template
+beforeMount //在组件内容被渲染到页面之前立即执行的函数
+mounted // 在组件内容被渲染到页面之后自动执行的函数
+beforeUpdate // 当data 中的数据发生变化时会自动执行的函数
+updated // 数据被改变，同时页面重新渲染后会自动执行的函数
+beforeUnmount // 当 Vue 实例销毁时 ---
+unmounted //当 Vue 实例彻底销毁时，且 DOM 更新后
+
+<!-- 模板知识点： -->
+{{ 插值表达式 }}
+
+如果想要在模板中把 data 里的 message 的
+'<strong>hello world</strong>'
+展示出来，那么就不能使用插值表达式了
+需要使用 v-html 指令
+<div v-html="message"></div>
+含义就是在这个 div 标签上通过 html 展示 message 变量
+
+如果想要让 title 显示 data 的 message 的值
+下面这么写是没用的，title 的值会显示为 message
+<div title="message">hello world</div>
+需要使用 v-bind 指令，将数据绑定起来
+<div v-bind:title="message">hello world</div>
+含义是让 title 的值与 message 做绑定
+可以用 <div :title="message"> 简写
+事件绑定 v-on: 可以用 @ 替代
+
+data(){
+  name: 'title'
+}
+<div :[name]="message">
+
+阻止默认事件
+@click.prevent="handleClick"
+
+如果想让模板中使用的 message 展示之后，改变 message，dom显示的不改变，可以使用 v-once
+<div v-once>{{ message }}</div>
+可以降低无用的渲染，提升性能
+
+
+使用计算属性 computed 
+那么 computed 与 methods 里面的方法有什么区别呢
+computed 当计算属性依赖的内容发生变更时，才会重新执行计算
+methods 只要页面重新渲染，才会重新计算
+
+computed 和 methods 都能实现的一个功能，建议使用computed，因为有缓存
+computed 和 watch 都能实现的功能，建议使用computed，因为代码会更加简洁
+
+如果子组件的模板有两个节点，那么不能在父组件调用时直接加上
+<demo class="xxx" />
+如果加了的话，可以在子组件的节点上加上
+<div :class="$attrs.class">
+
+使用 styleObject{
+  color: 'red',
+  background: 'yellow'
+}
+
+v-if 和 v-show 
+v-show 是通过 style 样式控制的 display：none
+v-if 会直接移除 dom 元素
+如果涉及频繁显示或隐藏dom元素，用 v-show ，不会重新渲染dom
+
+<!-- vue 中的条件判断 -->
+v-if
+v-else-if 
+v-else
+
+v-if 和 v-else 要贴在一起
+
+<!-- 列表循环渲染 -->
+v-for
+
+listArray: ['a','b','c']
+<div v-for="(items, index) in list" :key="items">
+{{ items }} --{{ index }}
+</div>
+
+listObject: {
+  firstName: "aaa"
+  lastName: "bbb"
+  job: "ccc"
+}
+<div v-for="(value , key , index) in listObject">
+{{ value }} --- {{ key }}
+打印的 value 是 aaa 、bbb 、ccc
+key 是下标  firstName ，lastName
+
+用vue循环的时候，要加key值，可以提升性能，避免重复渲染相同的dom元素
+
+改变页面元素方法
+1.使用数组的变更函数，push、pop、shift、splice、reverse等
+2.直接替换数组
+可以使用 cancat 和 filter
+3.直接更新数组的内容
+this.listArray[1] = 'hello'
+
+在同一个元素标签上同时写 v-for 和 v-if 会出错误
+v-for 的优先级更高
+同时用的话 ，为了防止出现两层div
+可以使用占位符 
+<template v-for>
+  <div v-if>
+  </div>
+</template>
+
+
+<!-- 事件绑定 -->
+methods: {
+  handleBtnClick (num, event){
+    this.counter += num
+  }
+}
+<button @click="handleBtnClick(2, $event)">
+
+如果要绑定两个事件的话，需要在方法后面加上（）
+<button @click="handleBtnClick() , handleBtnClick1()">
+
+停止冒泡 修饰符
+<button @click.stop="xxx">
+
+self 必须是自己本身这个元素触发的事件
+<div @click.self="xxx">
+
+阻止默认行为
+prevent
+
+捕获
+capture
+
+只执行一次
+once
+
+滚动事件的默认行为 (即滚动行为) 将会立即触发
+passive
+
+
+<!-- 按键修饰符 -->
+enter、delete、tab、esc、up、down、left、right
+<input @keydown.enter="xxx">
+
+<!-- 鼠标修饰符 -->
+left、right、middle
+<div @click.left="xxx">
+
+<!-- 精确修饰符 -->
+exact
+
+<!-- 表单中双向绑定 -->
+input、textarea、checkbox、radio
+都使用 v-model 实现双向数据绑定
+checkbox 和 radio 要加 value 值
+使用checkbox的话 data 中的 message 可以设成一个空数组 []
+使用 radio 因为是单选，message 设置空字符串， ''
+
+message : []
+<select v-model="message" multiple>
+  <option disabled value=''>请选择内容</option>
+  <option value='A'>A</option>
+  <option value='B'>B</option>
+  <option value='C'>C</option>
+</seclect>
+
+checkbox 中 默认的值 true 和 false 可以改变
+true-value="hello"
+false-value="world"
+
+v-model.number
+v-model.trim  //把字符串前后的空格去掉
+v-model.lazy
+
+
+<!-- 组件 -->
+组件具备复用性
+每个组件中的数据是独享的，不共用
+全局组件，只要定义了，处处可以使用，性能不高，但是使用简单
+名字建议小写字母开头，用 - 间隔
+
+局部组件，在根组件中用如下语法
+components: { 'counter'（组件名）: counter（外部定义的） }
+名字一样可以直接使用 { counter }
+定义了之后，要注册之后才能使用，性能比较高
+
+局部组件的名字大写 比如 HelloWorld ，大写开头，驼峰命名
+局部组件要做名字和组件之间的映射对象，vue也会自动转换
+
+动态传参  、  静态传参
+content="123"  //静态 typeof是string
+
+data() {
+  return {
+    num: 123
+  }
+}
+v-bind:content="num"
+
+<!-- 子组件接收参数校验 -->
+props: {
+  content: {
+    type:　String,
+    required： true, //必填
+    default: function() {
+      return 123;
+    }  //默认值
+    validator: function(value) {
+      return value < 1000;
+    }  //深度校验
+}
+
+
+把要传递的参数放在父组件的data中，用对象 params 包裹
+v-bind="params"
+相当于下面的简写
+:content="params.content"
+:a="params.a"
+
+
+如果父组件传参使用 :content-abc="content" 向子组件传递参数
+子组件接收需要使用驼峰 props: ['contentAbc']
+
+
+子组件不能修改父组件中的数据，只能展示
+如果想要用父组件中的数据进行修改，只能在data中复制一份父组件中的数据，this.data
+为什么要设置单向数据流呢，比如父组件中有多个地方调用了父组件中的数据，如果子组件能够修改父组件中的数据，就会造成组件之间的数据耦合，造成潜在的bug
+
+
+<!-- Non-Props 属性 -->
+inheritAttrs : false
+这样的话就不会把父组件传给子组件的值放在子组件的属性上
+一般用在父组件给子组件传递样式 style
+
+如果子组件有多个 div ，并且没用props接收
+父组件传的参数不会挂载
+可以使用 <div v-bind="$attrs"> 就能接收全部的父组件传递的non-props 属性
+也可以在后面加上属性名字选择性的绑定属性 
+v-bind:msg="$attrs.msg"
+
+
+<!-- 父子组件间如何通过事件进行通信 -->
+子组件触发事件用驼峰命名
+this.$emit('addOne')
+
+父组件在模板的标签中监听事件的时候需要使用 add-one 命名
+@="handleAddOne"
+
+整个子组件向父组件进行通信的过程大概是
+子组件在模板中绑定一个事件 handleClick
+子组件中的方法 handleClick 中使用 $emit 调用，传递一个自定义事件名称为 addOne (驼峰命名)
+父组件在模板中使用事件绑定 @add-one="handleAddOne"接收响应，执行自身methods中的 handleAddOne 方法
+父组件中定义的 handleAddOne 方法，修改自身属性
+
+如果在 $emit() 中添加额外的参数，例如
+$emit('add', 2)
+父组件中的方法要用 handleAdd (param) 接收参数
+
+子组件也可以在自身把需要的属性值计算出来，再传递给父组件
+例如 this.$emit('add', this.count += 3)
+父组件用 handleAdd (count) {
+  this.count = count;
+}
+这样接收就可以了
+
+在子组件中用 emits: {
+  add: () => {
+    if(count < 0) {
+      return true
+    } 
+    return false ;
+  }
+}
+可以用这个对传递出去的参数进行校验
+如果不匹配，vue会发出警告
+
+
+也可以使用 v-model 完成父子组件间的双向数据绑定
+子组件的 props: ['modelValue'] 这个写法约定俗成
+methods:　{
+  handleClick() {
+    this.$emit('update:modelVaule', this.modelValue + 3)
+  }
+}
+template: `
+  <div @click="handleClick">{{modelValue}}</div>
+`
+
+父组件使用子组件：
+template: `
+  <counter v-model="count" />
+`
+
+主要就是使用 update:modelValue,
+modelValue 是默认值，如果想要换成别的名字，在父组件中使用
+v-model:xxx="count"
+
+子组件通过 modelModifiers 接收父组件在 v-model. 上的修饰符
+props:{  
+  'modelModifiers': {
+    default: () => ({})   // 默认值，如果不传修饰符就置空
+  }
+}
+可以实现当父组件在子组件模板上使用 v-model 添加修饰符时使用
+然后在 methods 中做一些方法，然后再传递给父组件
+
+
+<!-- 使用插槽和具名插槽解决组件内容传递问题 -->
+slot
+子组件使用插槽
+<slot><slot>
+父组件：
+<myform>
+  <div>提交</div>
+</myform>
+<myform>
+  <button>提交</button>
+</myform>
+
+注意： slot 不能使用事件绑定
+可以在外层添加一个 span 标签，在 span 上做事件绑定
+插槽也可以在父组件中传递子组件
+
+slot 中使用的数据，作用域的问题
+父模板里调用的数据属性，使用的都是父模板里的数据
+子模板里调用的数据属性，使用的都是子模板里的数据
+{{ text }} 写在哪个里就用哪里的数据
+
+
+给插槽中添加默认值
+<slot> default value </slot>
+如果父组件使用子组件时里面不是空的，就不会使用默认值
+
+
+
+<!-- 具名插槽 -->
+如何把 slot 拆分
+slot 需要用 template(占位符) 包裹
+父组件：
+<layout>
+  <template #header(简写)>
+    <div> header </div>
+  </template>
+  <template v-slot:footer>
+    <div> footer </div>
+  </template>
+</layout>
+
+子组件：
+<div>
+  <slot name="header"></slot>
+  <div>content</div>
+  <slot name="footer"></slot>
+</div>
+
+
+插槽slot主要用 标签 、DOM 的传递
+
+
+<!-- 作用域插槽 -->
+父组件在使用子组件时使用如下来接收数据
+<layout v-slot="slotProps">
+使用时用 slotProps.item
+
+子组件使用
+<slot :item="item">
+
+作用域插槽解决什么问题
+当子组件要渲染的内容要由父组件决定的时候，作用域插槽能够让父组件调用子组件的数据
+
+作用域插槽的内部工作原理是将你的插槽内容包裹在一个拥有单个参数的函数里
+function (slotProps) {
+  // 插槽内容
+}
+
+解构插槽
+<current-user v-slot="{ user }">
+  {{ user.firstName }}
+</current-user>
+
+
+<!-- 动态组件 -->
+多个组件，例如 input-item 和 common-item
+父组件的data 中 currentItem:'input-item'
+模板中使用
+<keep-alive>
+<component :is="currentItem">
+</keep-alive>
+缓存
+
+动态组件：根据数据的变化，结合 compoment 标签，来随时切换组件的显示
+
+
+<!-- 异步组件 -->
+app.component('async-common-item' , Vue.defineAsyncComponent(() => {
+  return new Promise((reslove, reject) => {
+    setTimeout(() => {
+      resolve({
+        template: `
+        <div> this is an async component </div>
+        `
+      })
+    },4000)
+  })
+}))
+
+
+<!-- ref -->
+获取 Dom 节点
+也可以获得子组件的引用，然后调用子组件的方法
+this.$refs.common.sayHello()
+
+<!-- provide / inject -->
+父组件用：
+provide: {
+  count: 1
+}
+
+孙子组件用：
+inject: ['count']
+
+使多层组件传值更加方便
+
+如果要把data 中的数据全部传递，需要把 provide 变成一个方法
+然后 return 出去
+provide() {
+  return this.count
+}
+传递出去的数据是一次性的，count 不会改变
+
+
+<!-- 过渡，动画 -->
+<transition>
+</transition>
+入场过渡效果
+.v-enter-from
+.v-enter-active
+.v-enter-to
+
+出场过渡效果
+v-leave-from
+v-leave-active
+v-leave-to
+
+可以在 <transition name="aaa">
+.aaa-enter-to
+
+<transition type="transition">
+<transition type="animation">
+<transition :duration="1000">
+<transition :duration="{enter: 1000, leave: 1000}">
+控制动画和过渡同步执行时的效果
+
+<!-- 写JS动画 -->
+<transition :css="false"
+  @before-enter="handleBeforeEnter"     el
+  @enter="handleEnterActive"   两个参数：el,done 
+  @after-enter="handleEnterEnd"         el
+  @before-leave    el
+  @leave           el,done
+  @after-leave     el
+>
+methods: {
+  handleBeforeEnter(el) {
+    el.style.color = "red";
+  },
+  handleEnterActive(el, done) {
+    const animation = setInterval(() => {
+      const color = el.style.color;
+      if(color === 'red') {
+        el.style.color = 'green';
+      } else {
+        el.style.color = 'red';
+      }
+    }, 1000)
+    setTimeout(() => {
+      clearInterval(animation);
+      done();
+    }, 1000)
+  }
+}
+
+
+<!-- 组件和元素切换动画的实现 -->
+先出再入
+<transition mode="out-in">
+先入再出
+<transition mode="in-out">
+
+控制刚进入的时候是否有动画效果
+<transition appear>
+
+做多个单组件之间的切换，除了可以使用 v-if, v-else
+也可以使用 <component :is="component" />
+
+
+<!-- 列表动画的实现 -->
+v-move
+<transition-group>
+
+<!-- 状态动画 -->
+通过控制数据实现
+
+
+<!-- mixin -->
+mixin 混入
+组件中 data 优先级高于 mixin data 优先级
+生命周期函数，先执行 mixin 里面的，再执行组件里的
+组件中 methods 优先级高于 mixin methods 优先级
+
+const myMixin = {
+  data() {
+    return {
+      number: 2
+    }
+  },
+  created() {
+    console.log('mixin created')
+  },
+  methods {
+
+  }
+}
+
+实例中：
+mixins: [myMixin],
+
+全局 mixin ，子组件也可以不引入就调用
+app.mixin() {
+  data() {
+    return {
+      number: 1
+    }
+  }
+}
+
+自定义的属性，组件中的优先级高于 mixin 属性的优先级
+number: 1
+this.$options.number 使用
+
+修改组件和mixin 之间 使用数据的优先级
+app.config.optionMergeStrategies.number = (mixinVal, appValue) => {
+  return mixinVal || appValue;
+}
+
+
+<!-- 自定义指令 directive -->
+    directive
+
+全局自定义指令：
+app.directive('focus', {
+  mounted(el) {
+    el.focus();
+  }
+})
+
+局部自定义指令：
+const directives = {
+  focus: {
+    mounted(el) {
+      el.focus();
+    }
+  }
+}
+组件中： 
+directives: directives,
+
+使用 v-focus
+
+如果想要使用数据绑定 v-pos="100"
+app.directive('pos', {
+  mounted(el, binding){
+    el.style.top = (binding.value + 'px')
+  }
+})
+
+如果生命周期函数，比如 mounted 和 updated 实现的功能一致
+可以简写为：
+app.directive('pos', (el, binding) => {
+  el.style[binding.arg] = (binding.value + 'px')
+})
+
+v-pos:abc="xxx"
+binding.arg = abc
+el.style[binding.arg]
+
+
+<!-- 传送门  teleprot -->
+<teleport to="body">
+<div><div>
+</teleport>
+
+<teleport to="#hello">
+
+
+<!-- render -->
+render funciton
+template -> render -> h -> 虚拟DOM（JS对象）
+-> 真实对象 -> 渲染展示
+
+父组件 template:
+<my-title :level="2">
+hello world
+</my-title>
+
+render() {
+  const { h } = Vue;
+  return h('h' + this.level, {}, 
+  [this.$slots.default(),
+   h('h4', {}, ['aaa'])   //可以用一个数组，做多层嵌套
+  ])
+}
+
+// 虚拟 DOM
+{
+  tagName: 'h2',
+  text: 'hello world',
+  attrtibutes: {}
+}
+
+第一个参数，定义标签是什么
+第二个参数，{} 包含的属性
+第三个参数，文本
+
+
+<!-- 插件 -->
+  plugin 插件
+解决的问题：把通用性的功能封装起来
+
+const myPlugin = {
+  install(app, options) {
+    
+  }
+}
+
+使用： app.use(myPlugin)
