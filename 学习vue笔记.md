@@ -921,3 +921,161 @@ const myPlugin = {
 }
 
 使用： app.use(myPlugin)
+
+
+
+<!-- Composition API -->
+// created 实例被完全初始化之前
+// setup 中不能使用 this，因为在setup 时，一些属性和方法还没有被挂载到 this 上
+// setup 不能调用实例上的方法，methods 可以调用它
+
+setup(props, context) {
+  return {
+    name: 'abc',
+    handleClick: () => {
+      alert(123)
+    }
+  }
+}
+
+
+<!-- ref, reactive -->
+ref, reactive
+响应式的引用
+原理，通过 proxy 对数据进行封装，当数据变化时，触发模板等内容的更新
+
+<!-- ref 处理基础类型的数据 -->
+
+setup(props, context) {
+  const { ref } = Vue;
+  // proxy, 'jack' 变成 proxy({value: 'jack'}) 这样一个响应式引用
+  let name = ref('jack');
+  setTimeout(() => {
+    name.value = 'lucas'
+  }, 2000)
+  return { name }
+}
+
+<!-- reactive 处理非基础类型的数据( [], {} ) -->
+setup(props, context) {
+  const { reactive } = Vue;
+  const nameObj = reactive({ name: 'jack'});
+  setTimeout(() =>　{
+    nameObj.name = 'lucas'
+  }, 2000)
+  return { nameObj }
+}
+
+
+<!-- readonly  -->
+<!-- toRefs -->
+如果创建的一个 reactive 的对象，要做解构的话，是不能再模板中直接使用的，它不具备响应式。
+如果想让它具备响应式，调用 toRefs 做转化，再使用解构就可以具备响应式了
+
+toRefs 原理：
+toRefs 会把 proxy({ name: 'jack'})
+变成{ name: proxy({ value: 'lucas'})}
+
+const { name } = toRefs(nameObj)
+return { name }
+
+<template>
+<div> {{ name }} </div>
+</template>
+
+
+<!-- toRef, context -->
+toRef 
+
+context 有三个属性
+const { attrs, slots, emit } = context;
+attrs  // None-Props 属性
+slots
+emit
+
+
+inputValue
+
+
+<!-- watch -->
+watch 侦听器
+
+// lazy 具备一定的惰性，首次页面展示不会执行
+// 参数可以拿到原始和当前值
+// 可以侦听多个数据的变化，用一个侦听器承载，用数组接收
+// 可以在第三个参数中填加属性，变成非惰性
+
+const nameObj = reactive({name: 'jack'})
+watch([() => nameObj.name, () => nameObj.englishName], 
+[(currentValue, curEngname), (prevValue, prevEngname)] => {
+  
+}, { immediate: true})
+
+
+<!-- watchEffect 侦听器，偏向于 effect  -->
+// 立即执行，没有惰性， immediate
+// 不需要传递需要侦听的内容，自动会感知代码依赖
+// 不需要传递很多参数，只要传递一个回调函数
+// watchEffect 不能获取数据之前的值
+
+const stop = watchEffect(() => {
+  setTimeout(() => {
+    stop();
+  }, 2000)
+})
+
+
+<!-- composition API 中的生命周期函数 -->
+beforeMount   => onBeforeMount
+mounted       => onMounted
+beforeUpdate  => onBeforeUpdate
+updated       => onupdated
+beforeUnmount => onBeforeUnmount
+unmounted     => onUnmounted
+
+beforeCreate, created 在 setup 中是没有的
+有 onRenderTracked 每次渲染后重新收集响应式依赖
+onRenderTriggered  每次触发页面重新渲染时自动执行
+
+
+<!-- provide, inject, 模板 Ref -->
+父组件：
+setup() {
+  const { provide, ref, readonly } = Vue;
+  const name = ref('jack');
+  provide('name', name);
+  provide('changeName', (value) => {
+    name.value = value;
+  })
+  return{ }
+}
+
+子组件：
+setup() {
+  const { inject } = Vue;
+  const name = inject('name', 'hello')
+  const changeName = inject('changeName')
+  const handleClick = () => {
+    changeName('lucas')
+  }
+  return { name, handleClick }
+}
+
+
+<!-- ref -->
+// 通过 ref 在compositionAPI 的语法下获取真实的 DOM 元素节点
+
+setup() {
+  const { ref, onMounted } = Vue;
+  const hello = ref(null);
+  onMounted(() => {
+    console.log(hello.value)
+  })
+  return{ hello }
+}
+template: `
+  <div>
+    <div ref="hello">hello world</div>
+  </div>
+`
+
