@@ -1079,3 +1079,81 @@ template: `
   </div>
 `
 
+<!-- 使用vue-cli -->
+main.js 是入口文件
+App.vue 文件，是一个单文件组件，分为三部分
+template
+script
+style
+
+<!-- router 路由 -->
+路由是根据 url 的不同，展示不同的内容
+
+<router-link> 是跳转路由的标签
+<router-view> 是负责展示当前路由对应的组件内容
+
+异步加载路由
+component: () => import('../views/About.vue')
+
+
+<!-- VueX 数据管理框架 -->
+VueX 创建了全局唯一的仓库，用来存放全局的数据
+想修改 VueX 中的数据，必须遵循一定的方法
+
+想改变数据，vuex 要求第一步，调用 dispatch 方法，必须派发一个 action, 名字叫做 change
+this.$store.dispatch('change')
+
+第二步，store 感知到你触发了一个叫做 change 的 action，执行 change 方法
+export default creatStore({
+  state: {
+    name: 'jack'
+  },
+  
+  actions: {
+    change() {
+      console.log('')
+
+第三步，提交一个 commit 触发一个 mutation
+    this.commit('change')
+    }
+  },
+  mutations: {
+
+第四步，对应的 mutation 被执行
+    change() {
+
+第五步，在 mutation 里面修改数据
+      this.state.name = 'lucas'
+    }
+  }
+})
+
+
+为什么要这么做呢？
+mutation 里面只允许写同步代码，不允许写异步代码
+actions 中放异步的代码
+所以 actions 使用 dispatch 接收请求
+而 mutations 使用 commit 接收请求
+也可以在 methods 使用 dispatch 的时候把想要传递的数据放入，然后在 actions 和 mutations 中用第二个传入的参数接收
+
+
+CompositionAPI 使用 VueX
+
+import { useStore } from 'vuex';
+export default {
+  setup {
+    const store = useStore()
+  }
+}
+
+
+<!-- axios -->
+import axios from 'axios'
+export default {
+  setup() {
+    axios.get('xxxx')
+      .then((response) => {
+        const msg = response.data.message;
+      })
+  }
+}
